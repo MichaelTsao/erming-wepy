@@ -79,56 +79,56 @@
 
   export default class Index extends wepy.page {
     data = {
-      range: "",
-      url: "",
+      range: '',
+      url: '',
       rangeList: [],
       rangeSelect: null,
       minutes: 15
     }
 
     onReady(e) {
-      this.audioCtx = wx.createAudioContext('myAudio')
+      this.audioCtx = wepy.createAudioContext('myAudio')
     }
 
     onLoad() {
-      wx.showToast({
-        title: '加载中',
-        icon: 'loading',
-        duration: 30000
-      })
-
-      setTimeout(this.checkInit, 100)
+//      wx.showToast({
+//        title: '加载中',
+//        icon: 'loading',
+//        duration: 30000
+//      })
+//
+//      setTimeout(this.checkInit, 100)
     }
 
-    checkInit() {
-      var app = getApp()
-
-      if (app.globalData.init == 0) {
-        setTimeout(this.checkInit, 100)
-      } else {
-        if (app.globalData.rangeSelect == null) {
-          wx.redirectTo({
-            url: '../chooseRange/choose'
-          })
-        }
-
-        var items = []
-
-        for (var id in app.globalData.rangeItems) {
-          items.push(app.showRange(app.globalData.rangeItems[id]))
-        }
-
-        var item = app.globalData.rangeItems[app.globalData.rangeSelect]
-        this.setData({
-          'range': app.showRange(item),
-          'url': item.file,
-          'rangeList': items,
-          'rangeSelect': app.globalData.rangeSelect
-        })
-
-        wx.hideToast()
-      }
-    }
+//    checkInit() {
+//      var app = getApp()
+//
+//      if (app.globalData.init == 0) {
+//        setTimeout(this.checkInit, 100)
+//      } else {
+//        if (app.globalData.rangeSelect == null) {
+//          wx.redirectTo({
+//            url: '../chooseRange/choose'
+//          })
+//        }
+//
+//        var items = []
+//
+//        for (var id in app.globalData.rangeItems) {
+//          items.push(app.showRange(app.globalData.rangeItems[id]))
+//        }
+//
+//        var item = app.globalData.rangeItems[app.globalData.rangeSelect]
+//        this.setData({
+//          'range': app.showRange(item),
+//          'url': item.file,
+//          'rangeList': items,
+//          'rangeSelect': app.globalData.rangeSelect
+//        })
+//
+//        wepy.hideToast()
+//      }
+//    }
 
     play() {
       setTimeout(this.audioCtx.pause(), this.data.minutes * 60 * 1000)
