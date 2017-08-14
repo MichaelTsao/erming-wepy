@@ -10,11 +10,11 @@
         </view>
       </view>
 
-      <view class="weui-cells__title">手机验证码</view>
+      <view class="weui-cells__title">验证码</view>
       <view class="weui-cells weui-cells_after-title">
         <view class="weui-cell weui-cell_input">
           <input class="weui-input"  maxlength="6" bindinput="setPhoneCode" style="width: 200px"/>
-          <button bindtap="sendCode">获取验证码</button>
+          <button @tap="sendCode">获取验证码</button>
         </view>
       </view>
 
@@ -64,28 +64,28 @@
     }
 
     onLoad() {
-//      var app = getApp();
-//      var that = this
-//
-//      wx.request({
-//        url: app.globalData.host + 'hospital/list',
-//        header: {
-//          'content-type': 'application/json'
-//        },
-//        success(res) {
-//          var ids = []
-//          var names = []
-//          for (var id in res.data) {
-//            ids.push(id)
-//            names.push(res.data[id])
-//          }
-//          console.log(names)
-//          that.setData({
-//            hospital: names,
-//            hospital_id: ids
-//          })
-//        }
-//      })
+      var app = getApp();
+      var that = this
+
+      wx.request({
+        url: app.globalData.host + 'hospital/list',
+        header: {
+          'content-type': 'application/json'
+        },
+        success(res) {
+          var ids = []
+          var names = []
+          for (var id in res.data) {
+            ids.push(id)
+            names.push(res.data[id])
+          }
+          console.log(names)
+          that.setData({
+            hospital: names,
+            hospital_id: ids
+          })
+        }
+      })
     }
 
     methods = {
@@ -94,7 +94,7 @@
         var that = this
 
         // 判断手机号合法
-        if (this.data.phone.length != 11) {
+        if (this.data.phone.length !== 11) {
           wx.showToast({
             title: '请正确填入手机号',
             icon: 'loading',
@@ -104,7 +104,7 @@
         }
 
         // 判断验证码合法
-        if (this.data.phoneCode.length == "") {
+        if (this.data.phoneCode.length === "") {
           wx.showToast({
             title: '请输入验证码',
             icon: 'loading',
@@ -114,7 +114,7 @@
         }
 
         // 判断密码合法
-        if (this.data.password.length == "") {
+        if (this.data.password.length === "") {
           wx.showToast({
             title: '请输入密码',
             icon: 'loading',
@@ -123,7 +123,7 @@
           return false
         }
 
-        if (this.data.password != this.data.password1) {
+        if (this.data.password !== this.data.password1) {
           wx.showToast({
             title: '两次密码不一致',
             icon: 'loading',
@@ -132,7 +132,7 @@
           return false
         }
 
-        if (this.data.name.length == "") {
+        if (this.data.name.length === "") {
           wx.showToast({
             title: '请输入名字',
             icon: 'loading',
@@ -236,7 +236,7 @@
     }
 
     sendCode() {
-      if (this.data.phone.length != 11) {
+      if (this.data.phone.length !== 11) {
         wx.showToast({
           title: '请正确填入手机号',
           icon: 'loading',
