@@ -169,7 +169,7 @@
       toast () {
         let promise = this.$invoke('toast', 'show', {
           title: '自定义标题',
-          img: 'https://raw.githubusercontent.com/kiinlam/wetoast/master/images/star.png'
+          img: 'http://www.cmbestsrv.com/assets/cm_loader_300x300.gif'
         })
 
         promise.then((d) => {

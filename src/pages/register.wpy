@@ -1,0 +1,254 @@
+<template>
+  <view class="container">
+    <text style="margin-left:1em">请您注册后使用，谢谢。</text>
+    <view class="page-section">
+
+      <view class="weui-cells__title">手机号</view>
+      <view class="weui-cells weui-cells_after-title">
+        <view class="weui-cell weui-cell_input">
+          <input class="weui-input"  maxlength="11" bindinput="setPhone"/>
+        </view>
+      </view>
+
+      <view class="weui-cells__title">手机验证码</view>
+      <view class="weui-cells weui-cells_after-title">
+        <view class="weui-cell weui-cell_input">
+          <input class="weui-input"  maxlength="6" bindinput="setPhoneCode" style="width: 200px"/>
+          <button bindtap="sendCode">获取验证码</button>
+        </view>
+      </view>
+
+      <view class="weui-cells__title">姓名</view>
+      <view class="weui-cells weui-cells_after-title">
+        <view class="weui-cell weui-cell_input">
+          <input class="weui-input"  maxlength="20" bindinput="setName"/>
+        </view>
+      </view>
+
+      <view class="weui-cells__title">注册地</view>
+      <view class="weui-cells weui-cells_after-title">
+        <view class="weui-cell weui-cell_input">
+          <picker bindchange="bindHospitalChange" value="{{hospital_index}}" range="{{hospital}}">
+            <view class="picker">
+              当前选择：{{hospital[hospital_index]}}
+            </view>
+          </picker>
+        </view>
+      </view>
+
+    </view>
+    <button bindtap="reg" style="margin-top: 1em">注册</button>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import Toast from 'wepy-com-toast'
+
+  export default class Register extends wepy.page {
+    config = {
+      navigationBarTitleText: '用户注册'
+    }
+
+    components = {
+      toast: Toast
+    }
+
+    data = {
+      phone: '',
+      phoneCode: '',
+      name: '',
+      hospital: [],
+      hospital_id: [],
+      hospital_index: 0
+    }
+
+    onLoad() {
+//      var app = getApp();
+//      var that = this
+//
+//      wx.request({
+//        url: app.globalData.host + 'hospital/list',
+//        header: {
+//          'content-type': 'application/json'
+//        },
+//        success(res) {
+//          var ids = []
+//          var names = []
+//          for (var id in res.data) {
+//            ids.push(id)
+//            names.push(res.data[id])
+//          }
+//          console.log(names)
+//          that.setData({
+//            hospital: names,
+//            hospital_id: ids
+//          })
+//        }
+//      })
+    }
+
+    methods = {
+      reg() {
+        var app = getApp()
+        var that = this
+
+        // 判断手机号合法
+        if (this.data.phone.length != 11) {
+          wx.showToast({
+            title: '请正确填入手机号',
+            icon: 'loading',
+            duration: 1000
+          })
+          return false
+        }
+
+        // 判断验证码合法
+        if (this.data.phoneCode.length == "") {
+          wx.showToast({
+            title: '请输入验证码',
+            icon: 'loading',
+            duration: 1000
+          })
+          return false
+        }
+
+        // 判断密码合法
+        if (this.data.password.length == "") {
+          wx.showToast({
+            title: '请输入密码',
+            icon: 'loading',
+            duration: 1000
+          })
+          return false
+        }
+
+        if (this.data.password != this.data.password1) {
+          wx.showToast({
+            title: '两次密码不一致',
+            icon: 'loading',
+            duration: 1000
+          })
+          return false
+        }
+
+        if (this.data.name.length == "") {
+          wx.showToast({
+            title: '请输入名字',
+            icon: 'loading',
+            duration: 1000
+          })
+          return false
+        }
+
+        // 发送请求
+        wx.login({
+          success: function(res) {
+            if (res.code) {
+              app.requestApi('user/register',
+                {
+                  "phone": that.data.phone,
+                  "code": that.data.phoneCode,
+                  "password": that.data.password,
+                  "name": that.data.name,
+                  "hospital": that.data.hospital_id[that.data.hospital_index],
+                  'weixin_code': res.code
+                },
+                'POST',
+                that.registerOk,
+                that.registerFail
+              )
+            }
+          }
+        })
+      }
+    }
+
+    registerOk(res) {
+      if (res.data[0] == "0") {
+        var token = res.data[1]
+        wx.setStorage({
+          key: "token",
+          data: token
+        })
+        wx.navigateTo({
+          url: '../chooseRange/choose'
+        })
+      } else {
+        if (res.data[0] == 1) {
+          wx.showToast({
+            title: '验证码错误',
+            icon: 'loading',
+            duration: 1000
+          })
+        } else {
+          wx.showToast({
+            title: res.data[1],
+            icon: 'loading',
+            duration: 1000
+          })
+        }
+      }
+    }
+
+    registerFail() {
+      wx.showToast({
+        title: '注册失败',
+        icon: 'loading',
+        duration: 1000
+      })
+    }
+
+    setPhone(e) {
+      this.setData({
+        phone: e.detail.value
+      })
+    }
+
+    setPhoneCode(e) {
+      this.setData({
+        phoneCode: e.detail.value
+      })
+    }
+
+    setPassword(e) {
+      this.setData({
+        password: e.detail.value
+      })
+    }
+
+    setPassword1(e) {
+      this.setData({
+        password1: e.detail.value
+      })
+    }
+
+    setName(e) {
+      this.setData({
+        name: e.detail.value
+      })
+    }
+
+    bindHospitalChange(e) {
+      this.setData({
+        hospital_index: e.detail.value
+      })
+    }
+
+    sendCode() {
+      if (this.data.phone.length != 11) {
+        wx.showToast({
+          title: '请正确填入手机号',
+          icon: 'loading',
+          duration: 1000
+        })
+      } else {
+        var app = getApp();
+        app.requestApi('site/send-code', {
+            phone: this.data.phone
+          }
+        )
+      }
+    }
+  }
+</script>

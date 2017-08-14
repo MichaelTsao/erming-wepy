@@ -1,0 +1,28 @@
+<template>
+  <view class="container">
+    <view class="page-section">
+      <view class="textarea-wrp">
+        <textarea disabled="true" style="height: 3em" value="   你只能接受的一个协议，请点同意" />
+      </view>
+    </view>
+    <button @tap="confirm">同意</button>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  export default class Protocol extends wepy.page {
+    config = {
+      navigationBarTitleText: '用户协议'
+    }
+
+    methods = {
+      confirm() {
+        wepy.navigateTo({
+          url: 'register'
+        })
+      }
+    }
+  }
+</script>
