@@ -6,14 +6,14 @@
       <view class="weui-cells__title">手机号</view>
       <view class="weui-cells weui-cells_after-title">
         <view class="weui-cell weui-cell_input">
-          <input class="weui-input"  maxlength="11" bindinput="setPhone"/>
+          <input class="weui-input"  maxlength="11" bindinput="setValue" id="phone"/>
         </view>
       </view>
 
       <view class="weui-cells__title">验证码</view>
       <view class="weui-cells weui-cells_after-title">
         <view class="weui-cell weui-cell_input">
-          <input class="weui-input"  maxlength="6" bindinput="setPhoneCode" style="width: 200px"/>
+          <input class="weui-input"  maxlength="6" bindinput="setValue" style="width: 200px" id="phoneCode"/>
           <button @tap="sendCode">获取验证码</button>
         </view>
       </view>
@@ -21,27 +21,18 @@
       <view class="weui-cells__title">姓名</view>
       <view class="weui-cells weui-cells_after-title">
         <view class="weui-cell weui-cell_input">
-          <input class="weui-input"  maxlength="20" bindinput="setName"/>
+          <input class="weui-input"  maxlength="20" bindinput="setValue" id="name"/>
         </view>
       </view>
-
-      <view class="weui-cells__title">注册地</view>
-      <view class="weui-cells weui-cells_after-title">
-        <view class="weui-cell weui-cell_input">
-          <picker bindchange="bindHospitalChange" value="{{hospital_index}}" range="{{hospital}}">
-            <view class="picker">
-              当前选择：{{hospital[hospital_index]}}
-            </view>
-          </picker>
-        </view>
-      </view>
-
     </view>
-    <button bindtap="reg" style="margin-top: 1em">注册</button>
+    <button @tap="reg" style="margin-top: 1em">注册</button>
+    <toast/>
   </view>
 </template>
 
 <script>
+  /* eslint-disable no-trailing-spaces */
+
   import wepy from 'wepy'
   import Toast from 'wepy-com-toast'
 
@@ -57,198 +48,100 @@
     data = {
       phone: '',
       phoneCode: '',
-      name: '',
-      hospital: [],
-      hospital_id: [],
-      hospital_index: 0
-    }
-
-    onLoad() {
-      var app = getApp();
-      var that = this
-
-      wx.request({
-        url: app.globalData.host + 'hospital/list',
-        header: {
-          'content-type': 'application/json'
-        },
-        success(res) {
-          var ids = []
-          var names = []
-          for (var id in res.data) {
-            ids.push(id)
-            names.push(res.data[id])
-          }
-          console.log(names)
-          that.setData({
-            hospital: names,
-            hospital_id: ids
-          })
-        }
-      })
+      name: ''
     }
 
     methods = {
       reg() {
-        var app = getApp()
-        var that = this
+        let error = ''
+        let self = this
 
         // 判断手机号合法
-        if (this.data.phone.length !== 11) {
-          wx.showToast({
-            title: '请正确填入手机号',
-            icon: 'loading',
-            duration: 1000
-          })
-          return false
+        if (this.phone.length !== 11) {
+          error = '请正确填入手机号'
         }
 
         // 判断验证码合法
-        if (this.data.phoneCode.length === "") {
-          wx.showToast({
-            title: '请输入验证码',
-            icon: 'loading',
-            duration: 1000
-          })
-          return false
+        if (this.data.phoneCode.length === '') {
+          error = '请输入验证码'
         }
 
-        // 判断密码合法
-        if (this.data.password.length === "") {
-          wx.showToast({
-            title: '请输入密码',
-            icon: 'loading',
-            duration: 1000
-          })
-          return false
+        if (this.data.name.length === '') {
+          error = '请输入名字'
         }
 
-        if (this.data.password !== this.data.password1) {
-          wx.showToast({
-            title: '两次密码不一致',
-            icon: 'loading',
-            duration: 1000
-          })
-          return false
-        }
-
-        if (this.data.name.length === "") {
-          wx.showToast({
-            title: '请输入名字',
-            icon: 'loading',
-            duration: 1000
-          })
+        if (error !== '') {
+          this.showError(error)
           return false
         }
 
         // 发送请求
-        wx.login({
-          success: function(res) {
+        wepy.login({
+          success: function (res) {
             if (res.code) {
-              app.requestApi('user/register',
-                {
-                  "phone": that.data.phone,
-                  "code": that.data.phoneCode,
-                  "password": that.data.password,
-                  "name": that.data.name,
-                  "hospital": that.data.hospital_id[that.data.hospital_index],
-                  'weixin_code': res.code
+              wepy.request({
+                url: self.$parent.globalData.host + '/user',
+                data: {
+                  weixin_code: res.code,
+                  phone: self.phone,
+                  code: self.code,
+                  name: self.name
                 },
-                'POST',
-                that.registerOk,
-                that.registerFail
-              )
+                method: 'POST',
+                success: function (d) {
+                  if (d.statusCode === 200) {
+                    wepy.setStorage({
+                      key: 'token',
+                      data: d.data.token
+                    })
+                    wepy.navigateTo({
+                      url: 'treat'
+                    })
+                  } else {
+                    self.showError(d.data.message)
+                  }
+                }
+              })
             }
           }
         })
-      }
-    }
+      },
 
-    registerOk(res) {
-      if (res.data[0] == "0") {
-        var token = res.data[1]
-        wx.setStorage({
-          key: "token",
-          data: token
-        })
-        wx.navigateTo({
-          url: '../chooseRange/choose'
-        })
-      } else {
-        if (res.data[0] == 1) {
-          wx.showToast({
-            title: '验证码错误',
-            icon: 'loading',
-            duration: 1000
-          })
+      sendCode() {
+        let self = this
+        if (this.phone.length !== 11) {
+          this.showError('请填入正确的手机号')
         } else {
-          wx.showToast({
-            title: res.data[1],
-            icon: 'loading',
-            duration: 1000
+          let promise = this.$invoke('toast', 'show', {
+            title: '发送中...',
+            img: 'http://www.cmbestsrv.com/assets/cm_loader_300x300.gif'
+          })
+          promise.then(() => {
+            wepy.request({
+              url: self.$parent.globalData.host + '/user/send-code',
+              data: {
+                phone: this.phone
+              },
+              success: function (d) {
+                if (d.statusCode !== 200) {
+                  self.showError(d.data.message)
+                }
+              }
+            })
           })
         }
       }
     }
 
-    registerFail() {
-      wx.showToast({
-        title: '注册失败',
-        icon: 'loading',
-        duration: 1000
-      })
+    setValue(e) {
+      this[e.target.id] = e.detail.value
     }
 
-    setPhone(e) {
-      this.setData({
-        phone: e.detail.value
+    showError(error) {
+      this.$invoke('toast', 'show', {
+        title: error,
+        img: 'http://ico.ooopic.com/ajax/iconpng/?id=215592.png'
       })
-    }
-
-    setPhoneCode(e) {
-      this.setData({
-        phoneCode: e.detail.value
-      })
-    }
-
-    setPassword(e) {
-      this.setData({
-        password: e.detail.value
-      })
-    }
-
-    setPassword1(e) {
-      this.setData({
-        password1: e.detail.value
-      })
-    }
-
-    setName(e) {
-      this.setData({
-        name: e.detail.value
-      })
-    }
-
-    bindHospitalChange(e) {
-      this.setData({
-        hospital_index: e.detail.value
-      })
-    }
-
-    sendCode() {
-      if (this.data.phone.length !== 11) {
-        wx.showToast({
-          title: '请正确填入手机号',
-          icon: 'loading',
-          duration: 1000
-        })
-      } else {
-        var app = getApp();
-        app.requestApi('site/send-code', {
-            phone: this.data.phone
-          }
-        )
-      }
     }
   }
 </script>

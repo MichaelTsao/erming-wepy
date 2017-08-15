@@ -1061,9 +1061,9 @@
     config = {
       pages: [
         'pages/treat',
+        'pages/index',
         'pages/protocol',
-        'pages/register',
-        'pages/index'
+        'pages/register'
       ],
       window: {
         backgroundTextStyle: 'light',
@@ -1124,7 +1124,7 @@
                 code: res.code
               },
               success: function (d) {
-                if (d.status === 200) {
+                if (d.statusCode === 200) {
                   wepy.setStorage({
                     key: 'token',
                     data: d.data.token
