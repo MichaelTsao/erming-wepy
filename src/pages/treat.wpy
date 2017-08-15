@@ -96,7 +96,8 @@
       rangeItem: [],
       rangeList: [],
       rangeSelect: 0,
-      minutes: 15
+      minutes: 15,
+      audioCtx: null
     }
 
     methods = {
@@ -105,9 +106,15 @@
       },
 
       rangeChange: function (e) {
-        console.log(e)
         this.rangeSelect = e.detail.value
         this.url = this.rangeItem[this.rangeSelect].file
+      },
+
+      play() {
+        let self = this
+        setTimeout(() => {
+          self.audioCtx.pause()
+        }, this.minutes * 1000 * 60)
       }
     }
 
@@ -131,14 +138,11 @@
             for (let item of d.data) {
               self.rangeList.push(self.$parent.showRange(item))
             }
+            self.url = self.rangeItem[self.rangeSelect].file
             self.$apply()
           }
         })
       })
-    }
-
-    play() {
-      setTimeout(this.audioCtx.pause(), this.minutes * 60 * 1000)
     }
   }
 </script>

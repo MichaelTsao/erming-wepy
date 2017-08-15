@@ -1076,7 +1076,7 @@
     globalData = {
       userInfo: null,
       userToken: null,
-      host: 'http://er.cx',
+      host: 'https://er.caoxw.com',
       userRange: 0
     }
 
