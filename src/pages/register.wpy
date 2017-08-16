@@ -62,11 +62,11 @@
         }
 
         // 判断验证码合法
-        if (this.data.phoneCode.length === '') {
+        if (this.phoneCode.length === '') {
           error = '请输入验证码'
         }
 
-        if (this.data.name.length === '') {
+        if (this.name.length === '') {
           error = '请输入名字'
         }
 
@@ -84,8 +84,9 @@
                 data: {
                   weixin_code: res.code,
                   phone: self.phone,
-                  code: self.code,
-                  name: self.name
+                  code: self.phoneCode,
+                  name: self.name,
+                  doctor: self.$parent.globalData.doctor
                 },
                 method: 'POST',
                 success: function (d) {
@@ -94,7 +95,7 @@
                       key: 'token',
                       data: d.data.token
                     })
-                    wepy.navigateTo({
+                    wepy.reLaunch({
                       url: 'treat'
                     })
                   } else {

@@ -122,7 +122,11 @@
       this.audioCtx = wepy.createAudioContext('myAudio')
     }
 
-    onLoad() {
+    onLoad(param) {
+      if ('q' in param) {
+        let p = param.q.split('%2F')
+        this.$parent.globalData.doctor = p[p.length - 1]
+      }
       let self = this
       let promise = this.$invoke('toast', 'show', {
         title: '加载中...',
