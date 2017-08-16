@@ -118,6 +118,23 @@
       }
     }
 
+    checkMember() {
+      let self = this
+      wepy.request({
+        url: self.$parent.globalData.host + '/user/member?access-token=' + wepy.getStorageSync('token'),
+        success: function (d) {
+          if (d.statusCode !== 200) {
+            wepy.reLaunch({
+              url: 'buy'
+            })
+          }
+          setTimeout(() => {
+            self.checkMember()
+          }, 1000 * 60)
+        }
+      })
+    }
+
     onReady(e) {
       this.audioCtx = wepy.createAudioContext('myAudio')
     }
@@ -146,6 +163,7 @@
             self.$apply()
           }
         })
+        self.checkMember()
       })
     }
   }

@@ -1,0 +1,50 @@
+<template>
+  <view class="container">
+    <view class="page-section">
+      <view class="textarea-wrp">
+        <textarea disabled="true" value="        您的服务期已结束，请购买。" />
+      </view>
+    </view>
+    <button @tap="buy">购买</button>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  export default class Buy extends wepy.page {
+    config = {
+      navigationBarTitleText: '购买服务'
+    }
+
+    methods = {
+      buy() {
+        wepy.request({
+          url: self.$parent.globalData.host + '/user/buy?access-token=' + wepy.getStorageSync('token'),
+          success: function (d) {
+            let p = d.data.param
+            console.log(p)
+            wepy.requestPayment({
+              'timeStamp': p.timeStamp,
+              'nonceStr': p.nonceStr,
+              'package': p.package,
+              'signType': 'MD5',
+              'paySign': p.paySign,
+              'success': function(res) {
+                wepy.reLaunch({
+                  url: 'treat'
+                })
+              },
+              'fail': function(res) {
+                this.$invoke('toast', 'show', {
+                  title: '支付失败',
+                  img: 'http://ico.ooopic.com/ajax/iconpng/?id=215592.png'
+                })
+              }
+            })
+          }
+        })
+      }
+    }
+  }
+</script>

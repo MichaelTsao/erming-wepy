@@ -1063,7 +1063,8 @@
         'pages/treat',
         'pages/index',
         'pages/protocol',
-        'pages/register'
+        'pages/register',
+        'pages/buy'
       ],
       window: {
         backgroundTextStyle: 'light',
@@ -1075,7 +1076,6 @@
 
     globalData = {
       userInfo: null,
-      userToken: null,
       host: 'https://er.caoxw.com',
 //      host: 'http://er.cx',
       userRange: 0,
@@ -1128,16 +1128,13 @@
               },
               success: function (d) {
                 if (d.statusCode === 200) {
-                  console.log('openID login OK')
-                  console.log(d)
                   wepy.setStorage({
                     key: 'token',
                     data: d.data.token
                   })
                   self.globalData.userRange = d.data.info.range
                 } else {
-                  console.log('openID login failed')
-                  wepy.redirectTo({
+                  wepy.reLaunch({
                     url: 'protocol'
                   })
                 }
