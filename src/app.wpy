@@ -1108,43 +1108,6 @@
       return range.min + 'Hz------' + range.max + 'Hz'
     }
 
-    checkToken() {
-      let token = wepy.getStorageSync('token')
-      if (!token) {
-        console.log('no token')
-        this.login()
-      }
-    }
-
-    login() {
-      let self = this
-      wepy.login({
-        success: function (res) {
-          if (res.code) {
-            wepy.request({
-              url: self.globalData.host + '/user/login',
-              data: {
-                code: res.code
-              },
-              success: function (d) {
-                if (d.statusCode === 200) {
-                  wepy.setStorage({
-                    key: 'token',
-                    data: d.data.token
-                  })
-                  self.globalData.userRange = d.data.info.range
-                } else {
-                  wepy.reLaunch({
-                    url: 'protocol'
-                  })
-                }
-              }
-            })
-          }
-        }
-      })
-    }
-
     getUserInfo(cb) {
       const that = this
       if (this.globalData.userInfo) {
